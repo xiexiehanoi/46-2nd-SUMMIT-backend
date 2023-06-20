@@ -3,7 +3,7 @@ const { dataSource } = require("./dataSource");
 const getUserById = async (userId) => {
   try {
     const [user] = await dataSource.query(
-    `SELECT
+      `SELECT
       id,
       email,
       name,
