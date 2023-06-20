@@ -5,7 +5,7 @@ CREATE TABLE `posts` (
   `post_type_id` INT NOT NULL,
   `title` VARCHAR(50) NOT NULL,
   `content` TEXT NOT NULL,
-  `image_url` VARCHAR(2000) NOT NULL,
+  `image_url` VARCHAR(2000) NULL,
   `rating` DECIMAL(4,2) NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,

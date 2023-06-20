@@ -3,7 +3,7 @@ CREATE TABLE `post_comments` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
   `post_id` INT NOT NULL,
-  `post_vote_id` INT NOT NULL,
+  `post_vote_id` INT NOT NULL DEFAULT 3,
   `content` VARCHAR(200) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
