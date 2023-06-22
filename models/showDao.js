@@ -89,32 +89,29 @@ const getShowDetail = async (userId, showId) => {
   try {
     const showDetail = await dataSource.query(
       `
-      SELECT
-        s.id AS showId,
-        s.title AS title,
-        s.content AS showDetail,
-        s.image_url AS imageUrl,
-        s.running_time AS runningTime,
-        s.genre_id AS genre,
-        s.start_date AS startDate,
-        s.end_date AS endDate,
-        GROUP_CONCAT(DISTINCT t.name) AS theaterNames,
-        COUNT(DISTINCT w.id) AS countWish,
-        w2.id AS wishId,
-        (w2.id IS NOT NULL) as isWished,
-       (
-        SELECT ROUND(AVG(p.rating),1) FROM posts AS p WHERE p.show_id = s.id AND p.post_type_id = 1
-       ) AS averageRating,
-       (
-        SELECT JSON_ARRAYAGG(JSON_OBJECT(
-         'grade', ss.grade,
-         'age', ss.age,
-         'price', ss.price,
-         'theater', ss.theater_id,
-         'runningTime', ss.showtime_id,
-         'ticket', ss.available_ticket,
-         'seatStatus', ss.status_id
-       ))
+    SELECT
+      s.id AS showId,
+      s.title AS title,
+      s.content AS showDetail,
+      s.image_url AS imageUrl,
+      s.running_time AS runningTime,
+      s.genre_id AS genre,
+      s.start_date AS startDate,
+      s.end_date AS endDate,
+      w.id AS wishId,
+    (
+      SELECT ROUND(AVG(p.rating),1) FROM posts AS p WHERE p.post_type_id = 1
+    ) AS averageRating,
+    (
+     SELECT JSON_ARRAYAGG(JSON_OBJECT(
+      'grade', ss.grade,
+      'age', ss.age,
+      'price', ss.price,
+      'theater', ss.theater_id,
+      'runningTime', ss.showtime_id,
+      'ticket', ss.available_ticket,
+      'seatStatus', ss.status_id
+    ))
       FROM show_seats AS ss
           INNER JOIN show_seats_status AS sss
           ON sss.id = ss.status_id
