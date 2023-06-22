@@ -11,12 +11,13 @@ const getPosts = async (post_type_id) => {
 };
 
 const updatePost = async ( userId, postId, title, content, imageUrl, rating) => {
-  const post = await postsDao.updatePost( userId, postId, title, content, imageUrl, rating);
-  return post;
+  const result = await postsDao.updatePost( userId, postId, title, content, imageUrl, rating);
+  return result;
 };
 
 const deletePost = async ( userId, postId ) => {
-  await postsDao.deletePost( userId, postId );
+  const result = await postsDao.deletePost( userId, postId );
+  return result;
 };
 
 const getPostById = async (userId, postId) => {

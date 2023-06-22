@@ -67,10 +67,13 @@ const updatePost = async (userId, postId, title, content, imageUrl, rating) => {
         AND user_id = ?`,
       [title, content, imageUrl, rating, postId, userId]
     );
+    if (result.affectedRows !== 1) {
+      throw new Error("FAILED_TO_UPDATE_DATA");
+    }
     return result;
   } catch (err) {
-    const error = new Error("INVALID_DATA_INPUT");
-    error.statusCode = 400;
+    const error = new Error(err.message || "INVALID_DATA_INPUT");
+    error.statusCode = err.statusCode || 400;
     throw error;
   }
 };
@@ -79,15 +82,18 @@ const deletePost = async (userId, postId) => {
   try {
     const result = await dataSource.query(
       `DELETE FROM
-        posts
-        WHERE id = ?
-        AND user_id = ?`,
+      posts
+      WHERE id = ?
+      AND user_id = ?`,
       [postId, userId]
     );
+    if (result.affectedRows !== 1) {
+      throw new Error("FAILED_TO_UPDATE_DATA");
+    }
     return result;
   } catch (err) {
-    const error = new Error("INVALID_DATA_INPUT");
-    error.statusCode = 400;
+    const error = new Error(err.message || "INVALID_DATA_INPUT");
+    error.statusCode = err.statusCode || 400;
     throw error;
   }
 };
@@ -138,10 +144,17 @@ const postVotePost = async (userId, postId, opinion) => {
 const getPostComments = async (postId) => {
   try {
     const result = await dataSource.query(
-      `
-      SELECT * FROM comments
-      WHERE post_id = ?
-      `,
+      `SELECT
+      p.id,
+      p.user_id,
+      p.post_type_id,
+      p.title,
+      p.content,
+      p.image_url,
+      p.rating,
+      p.show_id
+    FROM posts p
+      WHERE post_id = ?`,
       [postId]
     );
     return result;
@@ -155,8 +168,12 @@ const getPostComments = async (postId) => {
 const getPostVote = async (userId, postId) => {
   try {
     const result = await dataSource.query(
-      `SELECT * FROM
-      post_votes
+      `SELECT
+      p.id
+      p.user_id,
+      p.post_id,
+      p.opinion
+      FROM post_votes p
       WHERE user_id = ?
       AND post_id = ?`,
       [userId, postId]

@@ -19,8 +19,8 @@ const createPost = catchAsync(async (req, res) => {
 
 const getPosts = catchAsync(async (req, res) => {
   const post_type_id = req.params;
-  await postsService.getPosts(post_type_id);
-  return res.status(200).json({ messge: "Get Complete" });
+  const postData = await postsService.getPosts(post_type_id);
+  return res.status(200).json(postData);
 });
 
 const updatePost = catchAsync(async (req, res) => {

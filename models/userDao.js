@@ -49,8 +49,14 @@ const createUser = async (kakaoId) => {
       [kakaoId]
     );
     const user = await dataSource.query(
-      `SELECT * FROM
-      users
+      `SELECT
+      u.id,
+      u.email,
+      u.name,
+      u.phone_number,
+      kakao_id,
+      u.point
+      FROM users u
       WHERE
       kakao_id = ?`,
       [kakaoId]
