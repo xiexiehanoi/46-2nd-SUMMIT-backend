@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
-const userDao = require("../models/userDao");
+const userDao = require('../models/userDao');
+const userService = require('../services/userService');
 
 const checkLogInToken = async (req, res, next) => {
   try {
+    console.log(req.headers.authorization)
     const accessToken = req.headers.authorization;
 
     if (!accessToken) {
@@ -12,7 +14,7 @@ const checkLogInToken = async (req, res, next) => {
 
     const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
 
-    const user = await userDao.getUserById(decoded.id);
+    const user = await userService.getUserById(decoded.id);
 
     if (!user) {
       const error = new BaseError("INVALID_USER", 401);
@@ -22,6 +24,7 @@ const checkLogInToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
+    console.log(err)
     return res.status(401).json({
       message: "INVALID_TOKEN",
     });

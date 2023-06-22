@@ -17,16 +17,18 @@ const signInKakao = async (kakaoToken) => {
 
     const kakaoId = data.id;
     const email = data.kakao_account.email;
+    const nickname = data.properties.nickname;
 
     let user = await userDao.getUserByKakaoId(kakaoId);
     
     if (!user) {
-      user = await userDao.createUser(kakaoId, email);
+      user = await userDao.createUser(kakaoId, email, nickname);
     }
   
     const payLoad = { id: user.id };
   
     const accessToken = jwt.sign(payLoad, process.env.JWT_SECRET);
+    console.log(accessToken);
     return { accessToken: accessToken };
   };
   
