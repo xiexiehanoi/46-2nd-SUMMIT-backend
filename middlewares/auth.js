@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const userDao = require("../models/userDao");
 
 const checkLogInToken = async (req, res, next) => {
   try {
