@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 
-
 const checkLogInToken = async (req, res, next) => {
   try {
     const accessToken = req.headers.authorization;
@@ -28,6 +27,14 @@ const checkLogInToken = async (req, res, next) => {
   }
 };
 
+const optionalCheckLogInToken = async (req, res, next) => {
+  if (req.headers.authorization) {
+    return checkLogInToken(req, res, next);
+  }
+  next();
+};
+
 module.exports = {
   checkLogInToken,
+  optionalCheckLogInToken,
 };
