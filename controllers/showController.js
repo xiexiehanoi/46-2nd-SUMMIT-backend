@@ -16,15 +16,18 @@ const getShowList = catchAsync(async (req, res) => {
   );
   res.status(200).json(showData);
 });
+
 const getShowDetail = catchAsync(async (req, res) => {
-  const { showId } = req.params;
   const userId = req.user?.id;
-  const result = await showService.getShowDetail(showId, userId);
+  const { showId } = req.params;
+  const result = await showService.getShowDetail(userId, showId);
   return res.status(200).json(result);
 });
 
 const getAllShows = catchAsync(async (req, res) => {
-  const All = await showService.getAllShows();
+  const userId = req.user?.id;
+  const { limit, offset } = req.params;
+  const All = await showService.getAllShows(userId, limit, offset);
   return res.status(200).json(All);
 });
 

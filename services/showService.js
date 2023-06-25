@@ -7,7 +7,8 @@ const getShowList = async (
   title,
   orderBy,
   limit,
-  offset
+  offset,
+  userId
 ) => {
   return showDao.getShowList(
     showId,
@@ -16,16 +17,17 @@ const getShowList = async (
     title,
     orderBy,
     limit,
-    offset
+    offset,
+    userId
   );
 };
 
-const getShowDetail = async (showId) => {
-  return showDao.getShowDetail(showId);
+const getShowDetail = async (userId, showId) => {
+  return showDao.getShowDetail(userId, showId);
 };
 
-const getAllShows = async () => {
-  return showDao.getAllShows();
+const getAllShows = async (userId, limit, offset) => {
+  return showDao.getAllShows(userId, limit, offset);
 };
 
 module.exports = {
