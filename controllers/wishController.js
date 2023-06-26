@@ -24,7 +24,7 @@ const deleteWishList = catchAsync(async (req, res) => {
   const { wishId } = req.query;
   await wishService.deleteWishList(userId, wishId);
 
-  return res.status(204).json("DELETED_WISHLIST");
+  return res.status(204);
 });
 
 module.exports = {

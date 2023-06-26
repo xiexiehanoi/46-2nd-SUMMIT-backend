@@ -23,9 +23,13 @@ const getWishList = async (userId) => {
     const result = await dataSource.query(
       `
             SELECT
-            id,
-            show_id
-            FROM wish_list
+            w.id,
+            w.show_id,
+            s.title,
+            s.image_url
+            FROM wish_list w
+            INNER JOIN shows s
+            ON s.id = w.show_id
             WHERE user_id =?
             `,
       [userId]
