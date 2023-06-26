@@ -39,15 +39,14 @@ const getUserByKakaoId = async (kakaoId) => {
   }
 };
 
-const createUser = async (kakaoId, email) => {
+const createUser = async (kakaoId) => {
   try {
     await dataSource.query(
       `INSERT INTO
         users(
-        kakao_id,
-        email
-        )VALUES (?, ?)`,
-      [kakaoId, email]
+        kakao_id
+        )VALUES (?)`,
+      [kakaoId]
     );
     const user = await dataSource.query(
       `SELECT * FROM
@@ -61,6 +60,8 @@ const createUser = async (kakaoId, email) => {
     throw new Error("DataSource_Error: " + err.message);
   }
 };
+
+
 
 module.exports = {
   getUserById,
