@@ -44,8 +44,12 @@ function orderByBuilder(orderBy) {
   return (orderQuery = orderBySelect[orderBy]);
 }
 
-function limitBuilder(limit = 9, offset = 0) {
-  return `LIMIT ${limit} OFFSET ${offset}`;
+function limitBuilder(limit, offset) {
+  if (!limit && !offset) {
+    return `LIMIT ${(limit = 9)} OFFSET ${(offset = 0)}`;
+  } else {
+    return `LIMIT ${limit} OFFSET ${offset}`;
+  }
 }
 
 module.exports = {

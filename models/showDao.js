@@ -3,45 +3,49 @@ const builder = require("./queryBuilder");
 
 const getShowList = async (
   showId,
-  genreId,
   address,
+  genreId,
   title,
   orderBy,
   limit,
-  offset
+  offset,
+  userId
 ) => {
   try {
     const whereCondition = builder.filterBuilder(
       showId,
-      genreId,
       address,
+      genreId,
       title
     );
     const orderQuery = builder.orderByBuilder(orderBy);
     const limitQuery = builder.limitBuilder(limit, offset);
-    const query = `
-         SELECT
-         s.title AS title,
-         s.content AS showDetail,
-         s.image_url AS imageUrl,
-         s.running_time AS runningTime,
-         s.genre_id AS genre,
-         s.start_date AS startDate,
-         s.end_date AS endDate,
+    const shows = await dataSource.query(
+      `
+      SELECT
+        s.title AS title,
+        s.content AS showDetail,
+        s.image_url AS imageUrl,
+        s.running_time AS runningTime,
+        s.genre_id AS genre,
+        s.start_date AS startDate,
+        s.end_date AS endDate,
+        COUNT(DISTINCT w.id) AS countWish,
+        (w2.id IS NOT NULL) as isWished,
        (
-         SELECT ROUND(AVG(p.rating),1) FROM posts AS p WHERE p.show_id = s.id AND p.post_type_id = 1
+        SELECT ROUND(AVG(p.rating),1) FROM posts AS p WHERE p.show_id = s.id AND p.post_type_id = 1
        ) AS averageRating,
        (
-         SELECT JSON_ARRAYAGG(JSON_OBJECT(
-           'grade', ss.grade,
-           'age', ss.age,
-           'price', ss.price,
-           'theater', ss.theater_id,
-           'runningTime', ss.showtime_id,
-           'ticket', ss.available_ticket,
-           'seatStatus', ss.status_id
-          ))
-          FROM show_seats AS ss
+        SELECT JSON_ARRAYAGG(JSON_OBJECT(
+         'grade', ss.grade,
+         'age', ss.age,
+         'price', ss.price,
+         'theater', ss.theater_id,
+         'runningTime', ss.showtime_id,
+         'ticket', ss.available_ticket,
+         'seatStatus', ss.status_id
+       ))
+      FROM show_seats AS ss
           INNER JOIN show_seats_status AS sss
           ON sss.id = ss.status_id
           INNER JOIN show_times AS st
@@ -49,25 +53,27 @@ const getShowList = async (
           INNER JOIN theaters AS t
           ON t.id = ss.theater_id
           WHERE ss.show_id = s.id
-          ) AS seatsDetail,
-          COUNT(DISTINCT w.id) AS countWish
-       FROM shows AS s
-       INNER JOIN show_seats as ss
-       ON ss.show_id = s.id
-       INNER JOIN posts AS p
-       ON p.id = s.id
-       INNER JOIN genres AS g
-       ON g.id = s.genre_id
-       INNER JOIN theaters AS t
-       ON t.id = ss.theater_id
-       LEFT JOIN wish_list AS w 
-       ON w.show_id = s.id
+          ) AS seatsDetail
+      FROM shows AS s
+      INNER JOIN show_seats as ss
+      ON ss.show_id = s.id
+      INNER JOIN posts AS p
+      ON p.id = s.id
+      INNER JOIN genres AS g
+      ON g.id = s.genre_id
+      INNER JOIN theaters AS t
+      ON t.id = ss.theater_id
+      LEFT JOIN wish_list AS w 
+      ON w.show_id = s.id
+      LEFT JOIN wish_list AS w2
+      ON w2.show_id = s.id AND w2.user_id = ?
         ${whereCondition}
         GROUP BY s.id
         ${orderQuery}
         ${limitQuery}
-        `;
-    const shows = await dataSource.query(query, [showId]);
+        `,
+      [userId, showId]
+    );
     return { shows };
   } catch (err) {
     const error = new Error("INVALID_DATA_LIST");
@@ -76,11 +82,11 @@ const getShowList = async (
   }
 };
 
-const getShowDetail = async (showId) => {
+const getShowDetail = async (userId, showId) => {
   try {
     const showDetail = await dataSource.query(
       `
-      SELECT
+    SELECT
       s.title AS title,
       s.content AS showDetail,
       s.image_url AS imageUrl,
@@ -88,18 +94,19 @@ const getShowDetail = async (showId) => {
       s.genre_id AS genre,
       s.start_date AS startDate,
       s.end_date AS endDate,
+      (w.id IS NOT NULL) AS isWished,
     (
       SELECT ROUND(AVG(p.rating),1) FROM posts AS p WHERE p.post_type_id = 1
     ) AS averageRating,
     (
-      SELECT JSON_ARRAYAGG(JSON_OBJECT(
-        'grade', ss.grade,
-        'age', ss.age,
-        'price', ss.price,
-        'theater', ss.theater_id,
-        'runningTime', ss.showtime_id,
-        'ticket', ss.available_ticket,
-        'seatStatus', ss.status_id
+     SELECT JSON_ARRAYAGG(JSON_OBJECT(
+      'grade', ss.grade,
+      'age', ss.age,
+      'price', ss.price,
+      'theater', ss.theater_id,
+      'runningTime', ss.showtime_id,
+      'ticket', ss.available_ticket,
+      'seatStatus', ss.status_id
     ))
       FROM show_seats AS ss
       INNER JOIN show_seats_status AS sss
@@ -111,11 +118,13 @@ const getShowDetail = async (showId) => {
       WHERE ss.show_id = s.id
       ) AS seatsDetail
     FROM shows AS s
+    LEFT JOIN wish_list AS w
+    ON w.show_id = s.id AND w.user_id = ?
     INNER JOIN posts AS p
-    ON p.id = s.id
+    ON p.show_id = s.id
     WHERE s.id = ?
             `,
-      [showId]
+      [userId, showId]
     );
     const reviews = await dataSource.query(
       `
@@ -137,21 +146,26 @@ const getShowDetail = async (showId) => {
   }
 };
 
-const getAllShows = async () => {
+const getAllShows = async (userId, limit, offset) => {
   try {
-    const result = dataSource.query(
+    const limitQuery = builder.limitBuilder(limit, offset);
+    const result = await dataSource.query(
       `
-    SELECT
-    s.title AS title,
-    s.content AS showDetail,
-    s.image_url AS imageUrl,
-    s.running_time AS runningTime,
-    s.genre_id AS genre,
-    s.start_date AS startDate,
-    s.end_date AS endDate
-    FROM shows AS s
-    limit 9 offset 0
-          `
+       SELECT
+        s.title AS title,
+        s.content AS showDetail,
+        s.image_url AS imageUrl,
+        s.running_time AS runningTime,
+        s.genre_id AS genre,
+        s.start_date AS startDate,
+        s.end_date AS endDate,
+        (w.id IS NOT NULL) as isWished
+      FROM shows AS s
+      LEFT JOIN wish_list AS w
+      ON w.show_id = s.id AND w.user_id = ?
+      ${limitQuery}
+          `,
+      [userId]
     );
     return result;
   } catch (err) {
