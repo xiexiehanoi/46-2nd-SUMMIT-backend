@@ -23,6 +23,7 @@ const getShowList = async (
     const shows = await dataSource.query(
       `
       SELECT
+        s.id AS showId,
         s.title AS title,
         s.content AS showDetail,
         s.image_url AS imageUrl,
@@ -87,6 +88,7 @@ const getShowDetail = async (userId, showId) => {
     const showDetail = await dataSource.query(
       `
     SELECT
+      s.id AS showId,
       s.title AS title,
       s.content AS showDetail,
       s.image_url AS imageUrl,
@@ -133,7 +135,7 @@ const getShowDetail = async (userId, showId) => {
     p.content as content,
     p.rating as rating
     FROM posts as p
-     WHERE p.show_id = ?
+    WHERE p.show_id = ?
             `,
       [showId]
     );
@@ -149,25 +151,32 @@ const getShowDetail = async (userId, showId) => {
 const getAllShows = async (userId, limit, offset) => {
   try {
     const limitQuery = builder.limitBuilder(limit, offset);
-    const result = await dataSource.query(
+    const showMain = await dataSource.query(
       `
-       SELECT
-        s.title AS title,
-        s.content AS showDetail,
-        s.image_url AS imageUrl,
-        s.running_time AS runningTime,
-        s.genre_id AS genre,
-        s.start_date AS startDate,
-        s.end_date AS endDate,
-        (w.id IS NOT NULL) as isWished
-      FROM shows AS s
-      LEFT JOIN wish_list AS w
-      ON w.show_id = s.id AND w.user_id = ?
-      ${limitQuery}
+      SELECT
+      s.id AS showId,
+      s.title AS title,
+      s.content AS showDetail,
+      s.image_url AS imageUrl,
+      s.running_time AS runningTime,
+      s.genre_id AS genre,
+      s.start_date AS startDate,
+      s.end_date AS endDate,
+      (w.id IS NOT NULL) as isWished,
+      GROUP_CONCAT(DISTINCT t.name) AS theaterNames
+     FROM shows AS s
+     LEFT JOIN wish_list AS w
+     ON w.show_id = s.id AND w.user_id = ?
+     LEFT JOIN show_seats AS ss 
+     ON ss.show_id = s.id
+     LEFT JOIN theaters AS t 
+     ON t.id = ss.theater_id
+     GROUP BY s.id
+     ${limitQuery}
           `,
       [userId]
     );
-    return result;
+    return showMain;
   } catch (err) {
     const error = new Error("INVALID_DATA_LIST");
     error.statusCode = 400;
