@@ -5,7 +5,7 @@ function filterBuilder(showId, genreId, address, title) {
     conditionArr.push(`s.id = ${showId}`);
   }
   if (genreId) {
-    conditionArr.push(`g.id IN (${genreId})`);
+    conditionArr.push(`g.id = ${genreId}`);
   }
 
   if (address) {
@@ -35,8 +35,8 @@ function orderByBuilder(orderBy) {
     return (orderQuery = "ORDER BY s.id");
   }
   const orderBySelect = Object.freeze({
-    ratingAsc: "ORDER BY avgRating ASC, s.id ASC",
-    ratingDesc: "ORDER BY avgRating DESC, s.id DESC",
+    ratingAsc: "ORDER BY averageRating ASC",
+    ratingDesc: "ORDER BY averageRating DESC",
     startDesc: "ORDER BY startDate DESC, s.start_date DESC",
     endDesc: "ORDER BY endDate DESC, s.end_date DESC",
     wishDesc: "ORDER BY countWish DESC, s.id DESC",

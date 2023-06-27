@@ -26,12 +26,7 @@ const getShowDetail = async (userId, showId) => {
   return showDao.getShowDetail(userId, showId);
 };
 
-const getAllShows = async (userId, limit, offset) => {
-  return showDao.getAllShows(userId, limit, offset);
-};
-
 module.exports = {
   getShowList,
   getShowDetail,
-  getAllShows,
 };

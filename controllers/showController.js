@@ -24,15 +24,7 @@ const getShowDetail = catchAsync(async (req, res) => {
   return res.status(200).json(result);
 });
 
-const getAllShows = catchAsync(async (req, res) => {
-  const userId = req.user?.id;
-  const { limit, offset } = req.params;
-  const All = await showService.getAllShows(userId, limit, offset);
-  return res.status(200).json(All);
-});
-
 module.exports = {
   getShowDetail,
   getShowList,
-  getAllShows,
 };

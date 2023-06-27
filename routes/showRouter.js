@@ -8,7 +8,6 @@ const showController = require("../controllers/showController");
 
 const router = express.Router();
 
-router.get("/all", optionalCheckLogInToken, showController.getAllShows);
 router.get("/:showId", optionalCheckLogInToken, showController.getShowDetail);
 router.get("", optionalCheckLogInToken, showController.getShowList);
 module.exports = {
