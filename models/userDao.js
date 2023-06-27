@@ -22,16 +22,15 @@ const getUserById = async (userId) => {
   }
 };
 
-const getUserByKakaoId = async (kakaoId) => {
+const getUserByKakaoId = async (kakaoId, email) => {
   try {
     const [user] = await dataSource.query(
       `SELECT
         id,
-        email,
-        name
+        email
       FROM users
       WHERE kakao_id = ?`,
-      [kakaoId]
+      [kakaoId, email]
     );
     return user;
   } catch (error) {
@@ -39,14 +38,15 @@ const getUserByKakaoId = async (kakaoId) => {
   }
 };
 
-const createUser = async (kakaoId) => {
+const createUser = async (kakaoId, email) => {
   try {
     await dataSource.query(
       `INSERT INTO
         users(
-        kakao_id
+        kakao_id,
+        email
         )VALUES (?)`,
-      [kakaoId]
+      [kakaoId, email]
     );
     const user = await dataSource.query(
       `SELECT

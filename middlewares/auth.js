@@ -1,11 +1,9 @@
 const jwt = require("jsonwebtoken");
-const userDao = require("../models/userDao");
 const userService = require("../services/userService");
 
 const checkLogInToken = async (req, res, next) => {
   try {
     const accessToken = req.headers.authorization;
-
     if (!accessToken) {
       const error = new Error("NEED_ACCESS_TOKEN", 401);
       return res.status(error.statusCode).json({ message: error.message });
@@ -23,7 +21,6 @@ const checkLogInToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log(err);
     return res.status(401).json({
       message: "INVALID_TOKEN",
     });
