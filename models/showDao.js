@@ -58,7 +58,7 @@ const getShowList = async (
           WHERE ss.show_id = s.id
           ) AS seatsDetail
       FROM shows AS s
-      INNER JOIN show_seats as ss
+      LEFT JOIN show_seats as ss
       ON ss.show_id = s.id
       LEFT JOIN posts AS p
       ON p.id = s.id

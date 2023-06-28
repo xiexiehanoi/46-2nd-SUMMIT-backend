@@ -46,7 +46,7 @@ function orderByBuilder(orderBy) {
 
 function limitBuilder(limit, offset) {
   if (!limit && !offset) {
-    return `LIMIT ${(limit = 9)} OFFSET ${(offset = 0)}`;
+    return `LIMIT ${(limit = 8)} OFFSET ${(offset = 0)}`;
   } else {
     return `LIMIT ${limit} OFFSET ${offset}`;
   }
