@@ -49,7 +49,7 @@ const deleteWishList = async (userId, wishId) => {
       `
             DELETE
             FROM wish_list
-            WHERE user_id =? in (?)
+            WHERE user_id = ? AND wish_list.id IN (?)
             `,
       [userId, wishId]
     );
