@@ -9,8 +9,8 @@
   <body style="margin: 0; padding: 0">
     <div id="wrap" style="padding: 32px">
       <h2 style="font-size: 36px">
-        조수진님<br />
-        <span style="color: #ea2a2a">예매내역확인서 </span><br />
+        <%= userId %>님<br />
+        <span style="color: #ea2a2a"><%= reservation_items.id %> </span><br />
         입니다.
       </h2>
       ​
@@ -40,7 +40,7 @@
               justify-content: center;
             "
           >
-            예약번호
+            <%= reservation.id %>
           </div>
           <div
             style="
@@ -83,7 +83,7 @@
               align-items: center;
             "
           >
-            빨래
+            <%= t.title %>
           </div>
         </div>
         <div style="display: flex; border-bottom: 1px solid #acacac">
@@ -111,7 +111,7 @@
               align-items: center;
             "
           >
-            2023년 8월 5일 14시
+            <%= shows.dates %>
           </div>
         </div>
         <div style="display: flex; border-bottom: 1px solid #acacac">
@@ -139,7 +139,7 @@
               align-items: center;
             "
           >
-            포은 아트홀
+            <%= reservation_items.id %>
           </div>
         </div>
         <div style="display: flex; border-bottom: 1px solid #acacac">
@@ -167,7 +167,7 @@
               align-items: center;
             "
           >
-            R석 2매
+           <%= show_seats.grade %>석 <%= reservation_items.quantity %>매
           </div>
         </div>
       </div>
